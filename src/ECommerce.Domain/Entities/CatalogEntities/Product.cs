@@ -1,3 +1,4 @@
+using ECommerce.Domain.Common;
 using ECommerce.Domain.Entities.UserEntities;
 
 namespace ECommerce.Domain.Entities.CatalogEntities;

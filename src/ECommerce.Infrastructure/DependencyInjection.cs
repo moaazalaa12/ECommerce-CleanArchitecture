@@ -1,8 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ECommerce.Application.Interfaces.Identity;
+using ECommerce.Domain.Interfaces;
+using ECommerce.Domain.Interfaces.Repositories;
+using ECommerce.Infrastructure.Identity;
+using ECommerce.Infrastructure.Persistence.DbContext;
+using ECommerce.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using ECommerce.Infrastructure.Persistence.DbContext;
 
 namespace ECommerce.Infrastructure;
 
@@ -16,9 +21,9 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString, b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
         // 2. Register Repositories & Unit of Work
-        //services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         //services.AddScoped<IOrderRepository, OrderRepository>(); // Specific repo example
-        //services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         // 3. Register External Services
         // services.AddTransient<IEmailService, SmtpEmailService>();
@@ -30,6 +35,15 @@ public static class DependencyInjection
 
         // 5. Register Background Jobs (Hosted Services)
         // services.AddHostedService<StockReservationCleanupJob>();
+
+        // 6. Register Identity
+        services.AddIdentityCore<ApplicationUser>(options => {
+            options.User.RequireUniqueEmail = true;
+        })
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
+
+        services.AddScoped<IIdentityService, IdentityService>();
 
         return services;
     }

@@ -1,8 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ECommerce.Infrastructure.Identity;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ECommerce.Infrastructure.Persistence.DbContext;
 
-public class ApplicationDbContext : Microsoft.EntityFrameworkCore.DbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
     // The constructor passes configurations to the base DbContext class
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }

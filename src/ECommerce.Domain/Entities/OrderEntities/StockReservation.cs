@@ -1,3 +1,6 @@
+using ECommerce.Domain.Common;
+using ECommerce.Domain.Entities.CatalogEntities;
+
 namespace ECommerce.Domain.Entities.OrderEntities;
 
 public class StockReservation : BaseEntity
@@ -9,6 +12,6 @@ public class StockReservation : BaseEntity
     public int? OrderId { get; set; }
     public bool IsReleased { get; set; } = false;
 
-    public CatalogEntities.Product Product { get; set; } = null!;
+    public Product Product { get; set; } = null!;
     public Order? Order { get; set; }
 }

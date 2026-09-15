@@ -1,3 +1,5 @@
+using ECommerce.Domain.Common;
+
 namespace ECommerce.Domain.Entities.CatalogEntities;
 
 public class ProductImage : BaseEntity

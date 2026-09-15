@@ -1,4 +1,6 @@
-namespace ECommerce.Domain.Entities.UserEntities;
+using ECommerce.Domain.Common;
+
+namespace ECommerce.Infrastructure.Identity;
 
 public class RefreshToken : BaseEntity
 {
@@ -6,11 +8,12 @@ public class RefreshToken : BaseEntity
     public DateTime Expires { get; set; }
     public DateTime Created { get; set; } = DateTime.UtcNow;
     public DateTime? Revoked { get; set; }
-    public string UserId { get; set; } = string.Empty;
+    public Guid UserId { get; set; } = Guid.Empty;
 
-    // Navigation Property
-    public ApplicationUser User { get; set; } = null!;
 
     public bool IsExpired => DateTime.UtcNow >= Expires;
     public bool IsActive => Revoked == null && !IsExpired;
+
+    // Navigational Properties
+    public ApplicationUser? User { get; set; }
 }

@@ -1,4 +1,6 @@
+using ECommerce.Domain.Common;
 using ECommerce.Domain.Enums;
+using ECommerce.Domain.ValueObjects;
 
 namespace ECommerce.Domain.Entities.OrderEntities;
 
@@ -10,11 +12,7 @@ public class Order : BaseEntity
     public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
     public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
 
-    public string ShippingStreet { get; set; } = string.Empty;
-    public string ShippingCity { get; set; } = string.Empty;
-    public string ShippingState { get; set; } = string.Empty;
-    public string ShippingCountry { get; set; } = string.Empty;
-    public string ShippingZipCode { get; set; } = string.Empty;
+    public Address? ShippingAddress { get; set; } = null;
 
     public decimal ShippingFee { get; set; }
     public string DeliveryMethod { get; set; } = string.Empty;
@@ -22,7 +20,6 @@ public class Order : BaseEntity
 
     public Guid? CouponId { get; set; }
 
-    public UserEntities.ApplicationUser User { get; set; } = null!;
     public Coupon? Coupon { get; set; }
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();

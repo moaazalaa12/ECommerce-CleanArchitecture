@@ -1,3 +1,4 @@
+using ECommerce.Domain.Common;
 using ECommerce.Domain.Enums;
 
 namespace ECommerce.Domain.Entities.UserEntities;
@@ -11,7 +12,4 @@ public class Notification : BaseEntity
     public bool IsRead { get; set; } = false;
     public Guid? RelatedEntityId { get; set; }
     public DateTime? ReadAt { get; set; }
-
-    // Navigation Property
-    public ApplicationUser User { get; set; } = null!;
 }

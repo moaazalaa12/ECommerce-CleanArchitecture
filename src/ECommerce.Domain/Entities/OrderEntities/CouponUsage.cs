@@ -1,3 +1,5 @@
+using ECommerce.Domain.Common;
+
 namespace ECommerce.Domain.Entities.OrderEntities;
 
 public class CouponUsage : BaseEntity
@@ -9,5 +11,4 @@ public class CouponUsage : BaseEntity
 
     public Coupon Coupon { get; set; } = null!;
     public Order Order { get; set; } = null!;
-    public UserEntities.ApplicationUser User { get; set; } = null!;
 }
