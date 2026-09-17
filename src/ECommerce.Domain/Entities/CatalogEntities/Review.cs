@@ -3,7 +3,7 @@ using ECommerce.Domain.Entities.UserEntities;
 
 namespace ECommerce.Domain.Entities.CatalogEntities;
 
-public class Review : BaseEntity
+public class ProductImage : BaseEntity
 {
     public Guid UserId { get; set; } = Guid.Empty;
     public Guid ProductId { get; set; }

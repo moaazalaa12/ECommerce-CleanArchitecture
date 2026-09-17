@@ -1,6 +1,5 @@
 ﻿using ECommerce.Application.Interfaces.Identity;
 using ECommerce.Domain.Interfaces;
-using ECommerce.Domain.Interfaces.Repositories;
 using ECommerce.Infrastructure.Identity;
 using ECommerce.Infrastructure.Persistence.DbContext;
 using ECommerce.Infrastructure.Repositories;
