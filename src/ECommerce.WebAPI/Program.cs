@@ -1,5 +1,8 @@
 using ECommerce.Application; 
 using ECommerce.Infrastructure;
+using ECommerce.Infrastructure.Identity;
+using ECommerce.Infrastructure.Persistence.DbContext;
+using Microsoft.AspNetCore.Identity;
 // using Presentation.Middleware; // Uncomment when you add your GlobalExceptionHandler
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Add API Controllers
 builder.Services.AddControllers();
 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+                    .AddRoles<IdentityRole<Guid>>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddDefaultTokenProviders();
 // 2. Wire up Clean Architecture Layers
 // This calls the DependencyInjection.cs files you created in the other layers
 builder.Services.AddApplicationServices();
@@ -33,6 +40,8 @@ if (app.Environment.IsDevelopment())
 // 5. Middleware Pipeline (Order is critical here)
 app.UseExceptionHandler(); // Catches crashes before they hit the user
 app.UseHttpsRedirection();
+
+builder.Services.AddDataProtection();
 
 app.UseAuthentication(); // Must be BEFORE Authorization
 app.UseAuthorization();

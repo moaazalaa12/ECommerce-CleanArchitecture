@@ -10,6 +10,8 @@ public static class DependencyInjection
     {
         var assembly = Assembly.GetExecutingAssembly();
 
+
+       
         // 1. Register AutoMapper
         services.AddAutoMapper(cfg => cfg.AddMaps(assembly));
 
