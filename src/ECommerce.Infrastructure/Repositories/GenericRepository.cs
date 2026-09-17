@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
-
-using ECommerce.Domain.Interfaces.Repositories;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Persistence.DbContext;
 using Microsoft.EntityFrameworkCore;
 
