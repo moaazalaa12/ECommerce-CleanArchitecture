@@ -1,15 +1,13 @@
 ﻿using ECommerce.Domain.Entities.CatalogEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace ECommerce.Infrastructure.Persistence.Configurations.CatalogConfigurations
 {
-    public class ReviewConfiguration : IEntityTypeConfiguration<ProductImage>
+    public class ReviewConfiguration : IEntityTypeConfiguration<Review>
     {
-        public void Configure(EntityTypeBuilder<ProductImage> builder)
+        public void Configure(EntityTypeBuilder<Review> builder)
         {
             throw new NotImplementedException();
         }
