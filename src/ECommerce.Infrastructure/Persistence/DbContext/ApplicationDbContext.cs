@@ -70,6 +70,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 case EntityState.Deleted:
                     entry.State = EntityState.Modified;
                     entry.Entity.DeletedAt = DateTime.UtcNow;
+                    entry.Entity.IsDeleted = true;
                     entry.Property(x => x.CreatedAt).IsModified = false;
                     entry.Property(x => x.CreatedBy).IsModified = false;
                     break;
