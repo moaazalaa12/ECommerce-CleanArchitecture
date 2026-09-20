@@ -11,7 +11,19 @@ namespace ECommerce.Infrastructure.Persistence.Configurations.OrderConfiguration
     {
         public void Configure(EntityTypeBuilder<Coupon> builder)
         {
-            throw new NotImplementedException();
+            builder.ToTable("Coupons");
+            builder.HasKey(c => c.Id);
+
+            builder.Property(c => c.Code).IsRequired().HasMaxLength(50);
+            builder.Property(c => c.DiscountType).IsRequired().HasConversion<string>().HasMaxLength(20);
+            builder.Property(c => c.DiscountValue).IsRequired().HasColumnType("decimal(18,2)");
+            builder.Property(c => c.MinOrderAmount).HasColumnType("decimal(18,2)");
+            builder.Property(c => c.ExpiryDate).IsRequired();
+            builder.Property(c => c.MaxUsageCount).IsRequired();
+            builder.Property(c => c.CurrentUsageCount).IsRequired().HasDefaultValue(0);
+            builder.Property(c => c.IsActive).IsRequired().HasDefaultValue(true);
+
+            builder.HasIndex(c => c.Code).IsUnique();
         }
     }
 }
