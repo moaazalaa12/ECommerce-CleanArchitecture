@@ -1,5 +1,7 @@
 ﻿using ECommerce.Application.Interfaces.Identity;
 using ECommerce.Domain.Interfaces;
+using ECommerce.Domain.Interfaces.CatalogInterfaces;
+using ECommerce.Domain.Interfaces.OrderInterfaces;
 using ECommerce.Infrastructure.Identity;
 using ECommerce.Infrastructure.Persistence.DbContext;
 using ECommerce.Infrastructure.Repositories;
@@ -23,6 +25,11 @@ public static class DependencyInjection
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         //services.AddScoped<IOrderRepository, OrderRepository>(); // Specific repo example
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IOrderRepository,OrderRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IStockReservationRepository, StockReservationRepository>();
+        services.AddScoped<ICouponUsageRepository, CouponUsageRepository>();
+        services.AddScoped<ICouponRepository, CouponRepository>();
 
         // 3. Register External Services
         // services.AddTransient<IEmailService, SmtpEmailService>();

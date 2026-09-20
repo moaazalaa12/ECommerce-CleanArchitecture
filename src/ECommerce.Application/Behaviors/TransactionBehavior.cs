@@ -1,13 +1,11 @@
-﻿using ECommerce.Domain.Interfaces;
+﻿using ECommerce.Application.Interfaces;
+using ECommerce.Domain.Interfaces;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ECommerce.Application.Behaviors
 {
     public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : notnull
+        where TRequest : notnull
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -18,21 +16,24 @@ namespace ECommerce.Application.Behaviors
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
+            var isTransactional = typeof(TRequest).GetInterfaces()
+                .Any(i => i == typeof(ITransactionalCommand) ||
+                          (i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ITransactionalCommand<>)));
 
-            if (!request.GetType().Name.EndsWith("Command"))
+            if (!isTransactional)
                 return await next();
 
-            await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             try
             {
                 var response = await next();
-                await _unitOfWork.CommitAsync();
+                await _unitOfWork.CommitAsync(cancellationToken);
                 return response;
             }
             catch
             {
-                await _unitOfWork.RollbackAsync();
+                await _unitOfWork.RollbackAsync(cancellationToken);
                 throw;
             }
         }
