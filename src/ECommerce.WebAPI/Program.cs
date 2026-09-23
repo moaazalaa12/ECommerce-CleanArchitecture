@@ -2,10 +2,12 @@ using ECommerce.Application;
 using ECommerce.Infrastructure;
 using ECommerce.Infrastructure.Identity;
 using ECommerce.Infrastructure.Persistence.DbContext;
+using ECommerce.WebAPI.Handlers;
 using Microsoft.AspNetCore.Identity;
 // using Presentation.Middleware; // Uncomment when you add your GlobalExceptionHandler
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // 1. Add API Controllers
 builder.Services.AddControllers();
@@ -29,6 +31,7 @@ builder.Services.AddSwaggerGen();
 // Note: builder.Services.AddOpenApi() generates the spec, but AddSwaggerGen() is needed for the actual UI.
 
 var app = builder.Build();
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
