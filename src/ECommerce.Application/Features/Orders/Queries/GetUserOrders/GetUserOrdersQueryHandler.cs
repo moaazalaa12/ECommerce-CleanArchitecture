@@ -6,17 +6,10 @@ using MediatR;
 
 namespace ECommerce.Application.Features.Orders.Queries.GetUserOrders
 {
-    public class GetUserOrdersQueryHandler : IRequestHandler<GetUserOrdersQuery, PagedResponse<OrderDto>>
+    public class GetUserOrdersQueryHandler
+        (IOrderRepository _orderRepository,
+        IMapper _mapper) : IRequestHandler<GetUserOrdersQuery, PagedResponse<OrderDto>>
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IMapper _mapper;
-
-        public GetUserOrdersQueryHandler(IOrderRepository orderRepository, IMapper mapper)
-        {
-            _orderRepository = orderRepository;
-            _mapper = mapper;
-        }
-
         public async Task<PagedResponse<OrderDto>> Handle(GetUserOrdersQuery request, CancellationToken cancellationToken)
         {
             var (orders, totalCount) = await _orderRepository.GetPagedUserOrdersAsync(

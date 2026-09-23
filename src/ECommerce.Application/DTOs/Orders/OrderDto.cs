@@ -12,7 +12,7 @@ namespace ECommerce.Application.DTOs.Orders
         public PaymentStatus PaymentStatus { get; set; }
         public AddressDto? ShippingAddress { get; set; }
         public decimal ShippingFee { get; set; }
-        public string DeliveryMethod { get; set; } = string.Empty;
+        public DeliveryMethod DeliveryMethod { get; set; }
         public decimal DiscountAmount { get; set; }
         public string? CouponCode { get; set; }
         public IReadOnlyList<OrderItemDto> OrderItems { get; set; } = new List<OrderItemDto>();

@@ -1,10 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ECommerce.Application.Interfaces;
+using ECommerce.Domain.Enums;
 
 namespace ECommerce.Application.Features.Orders.Commands.UpdateOrderStatus
 {
-    internal class UpdateOrderStatusCommand
+    public class UpdateOrderStatusCommand : ITransactionalCommand<bool>
     {
+        public Guid OrderId { get; set; }
+        public OrderStatus NewStatus { get; set; }
+
+        public UpdateOrderStatusCommand(Guid orderId, OrderStatus newStatus)
+        {
+            OrderId = orderId;
+            NewStatus = newStatus;
+        }
     }
 }

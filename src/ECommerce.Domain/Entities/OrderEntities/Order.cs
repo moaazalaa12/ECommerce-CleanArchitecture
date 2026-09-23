@@ -15,8 +15,8 @@ public class Order : BaseEntity
     public Address? ShippingAddress { get; set; } = null;
 
     public decimal ShippingFee { get; set; }
-    public string DeliveryMethod { get; set; } = string.Empty;
-    public decimal DiscountAmount { get; private set; } = 0;
+    public DeliveryMethod DeliveryMethod { get; set; }
+    public decimal DiscountAmount { get; init; } = 0;
 
     public Guid? CouponId { get; set; }
 

@@ -1,10 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ECommerce.Application.Validators;
+using FluentValidation;
 
 namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
 {
-    internal class CreateOrderValidator
+    public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
     {
+        public CreateOrderCommandValidator()
+        {
+            RuleFor(c => c.UserId).NotEmpty().NotEqual(Guid.Empty);
+
+            RuleFor(c => c.DeliveryMethod).IsInEnum();
+
+            RuleFor(c => c.ShippingAddress)
+                .NotNull()
+                .SetValidator(new AddressDtoValidator());
+
+            RuleFor(c => c.Items).NotEmpty();
+            RuleForEach(c => c.Items).SetValidator(new OrderItemRequestDtoValidator());
+        }
     }
 }

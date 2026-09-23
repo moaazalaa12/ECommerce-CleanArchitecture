@@ -1,42 +1,29 @@
-﻿using ECommerce.Domain.Enums;
+﻿using Application.Exceptions;
+using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces.CatalogInterfaces;
 using ECommerce.Domain.Interfaces.OrderInterfaces;
 using MediatR;
 
 namespace ECommerce.Application.Features.Orders.Commands.CancelOrder
 {
-    public class CancelOrderCommandHandler : IRequestHandler<CancelOrderCommand, bool>
+    public class CancelOrderCommandHandler(
+        IOrderRepository _orderRepository,
+        IStockReservationRepository _stockReservationRepo,
+        IProductRepository _productRepo,
+        ICouponUsageRepository _couponUsageRepo, 
+        ICouponRepository _couponRepo) : IRequestHandler<CancelOrderCommand, bool>
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IStockReservationRepository  _stockReservationRepo;
-        private readonly IProductRepository _productRepo;
-        private readonly ICouponUsageRepository _couponUsageRepo;
-        private readonly ICouponRepository _couponRepo;
-
-        public CancelOrderCommandHandler(
-            IOrderRepository orderRepository,
-            IStockReservationRepository stockReservationRepo,
-            IProductRepository productRepo,
-            ICouponUsageRepository couponUsageRepo,
-            ICouponRepository couponRepo)
-        {
-            _orderRepository = orderRepository;
-            _stockReservationRepo = stockReservationRepo;
-            _productRepo = productRepo;
-            _couponUsageRepo = couponUsageRepo;
-            _couponRepo = couponRepo;
-        }
 
         public async Task<bool> Handle(CancelOrderCommand request, CancellationToken cancellationToken)
         {
             var order = await _orderRepository.GetOrderWithDetailsByIdAsync(request.OrderId, cancellationToken);
 
             if (order == null || order.UserId != request.UserId)
-                throw new UnauthorizedAccessException("Order not found or you are not authorized to cancel it.");
+                throw new UnauthorizedException("Order not found or you are not authorized to cancel it.");
 
 
             if (order.OrderStatus != OrderStatus.Pending && order.OrderStatus != OrderStatus.Processing)
-                throw new InvalidOperationException($"Cannot cancel order because it is in '{order.OrderStatus}' status.");
+                throw new BadRequestException($"Cannot cancel order because it is in '{order.OrderStatus}' status.");
 
 
             order.OrderStatus = OrderStatus.Cancelled;
