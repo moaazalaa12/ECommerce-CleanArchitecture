@@ -14,5 +14,7 @@ namespace ECommerce.Domain.Interfaces.OrderInterfaces
             OrderSortColumn? sortBy,
             bool isDescending,
             CancellationToken cancellationToken = default);
+
+        Task<Order?> GetOrderByPaymentIntentIdAsync(string paymentIntentId);
     }
 }

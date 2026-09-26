@@ -14,15 +14,8 @@ namespace ECommerce.WebAPI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class OrdersController : ControllerBase
+    public class OrdersController(IMediator _mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public OrdersController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderCommand command)
         {

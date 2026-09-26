@@ -1,28 +1,30 @@
-using ECommerce.Application; 
+using ECommerce.Application;
 using ECommerce.Infrastructure;
-using ECommerce.Infrastructure.Identity;
-using ECommerce.Infrastructure.Persistence.DbContext;
 using ECommerce.WebAPI.Handlers;
-using Microsoft.AspNetCore.Identity;
-// using Presentation.Middleware; // Uncomment when you add your GlobalExceptionHandler
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Configuration.Sources.Clear();
+
+
+builder.Configuration
+    .SetBasePath(builder.Environment.ContentRootPath)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+
 
 // 1. Add API Controllers
 builder.Services.AddControllers();
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
-                    .AddRoles<IdentityRole<Guid>>()
-                    .AddEntityFrameworkStores<ApplicationDbContext>()
-                    .AddDefaultTokenProviders();
 // 2. Wire up Clean Architecture Layers
 // This calls the DependencyInjection.cs files you created in the other layers
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // 3. Global Exception Handling
-// builder.Services.AddExceptionHandler<GlobalExceptionHandler>(); // Uncomment when created
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails(); // Required for the exception handler to format responses
 
 // 4. OpenAPI & Swagger UI
@@ -30,8 +32,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Note: builder.Services.AddOpenApi() generates the spec, but AddSwaggerGen() is needed for the actual UI.
 
+builder.Services.AddDataProtection();
+builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 var app = builder.Build();
-app.UseExceptionHandler();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -44,7 +48,6 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler(); // Catches crashes before they hit the user
 app.UseHttpsRedirection();
 
-builder.Services.AddDataProtection();
 
 app.UseAuthentication(); // Must be BEFORE Authorization
 app.UseAuthorization();
