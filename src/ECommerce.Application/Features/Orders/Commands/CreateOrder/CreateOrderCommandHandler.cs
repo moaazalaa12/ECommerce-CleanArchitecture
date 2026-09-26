@@ -1,19 +1,11 @@
 ﻿using Application.Exceptions;
 using ECommerce.Application.Features.Orders.Commands.CreateOrder;
-using ECommerce.Application.Orders.Commands.CreateOrder;
-using ECommerce.Domain.Entities.CatalogEntities;
 using ECommerce.Domain.Entities.OrderEntities;
 using ECommerce.Domain.Enums;
-using ECommerce.Domain.Interfaces;
 using ECommerce.Domain.Interfaces.CatalogInterfaces;
 using ECommerce.Domain.Interfaces.OrderInterfaces;
 using ECommerce.Domain.ValueObjects;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ECommerce.Application.Orders.Commands.CreateOrder
 {

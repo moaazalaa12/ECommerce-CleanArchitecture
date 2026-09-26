@@ -61,5 +61,13 @@ namespace ECommerce.Infrastructure.Repositories
 
             return (orders, totalCount);
         }
+
+        public async Task<Order?> GetOrderByPaymentIntentIdAsync(string paymentIntentId)
+        {
+            return await _dbContext.Orders
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o =>
+                    o.Payments.Any(p => p.TransactionId == paymentIntentId));
+        }
     }
 }

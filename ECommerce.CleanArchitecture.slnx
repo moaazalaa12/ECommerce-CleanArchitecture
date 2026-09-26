@@ -1,8 +1,9 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/ECommerce.WebAPI/ECommerce.WebAPI.csproj" />
+    <Project Path="src/ECommerce.Application.UnitTests/ECommerce.Application.UnitTests.csproj" Id="03f1ff5f-5ed2-420a-acbb-7ba3a691e42c" />
     <Project Path="src/ECommerce.Application/ECommerce.Application.csproj" />
     <Project Path="src/ECommerce.Domain/ECommerce.Domain.csproj" />
     <Project Path="src/ECommerce.Infrastructure/ECommerce.Infrastructure.csproj" />
+    <Project Path="src/ECommerce.WebAPI/ECommerce.WebAPI.csproj" />
   </Folder>
 </Solution>
