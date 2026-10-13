@@ -11,7 +11,14 @@ namespace ECommerce.Infrastructure.Persistence.Configurations.UserConfigurations
     {
         public void Configure(EntityTypeBuilder<UserAddress> builder)
         {
-            throw new NotImplementedException();
+            builder.OwnsOne(ua => ua.AddressDetails, ad =>
+            {
+                ad.Property(a => a.Street).HasColumnName("Street").HasMaxLength(200).IsRequired();
+                ad.Property(a => a.City).HasColumnName("City").HasMaxLength(100).IsRequired();
+                ad.Property(a => a.State).HasColumnName("State").HasMaxLength(100).IsRequired();
+                ad.Property(a => a.Country).HasColumnName("Country").HasMaxLength(100).IsRequired();
+                ad.Property(a => a.ZipCode).HasColumnName("ZipCode").HasMaxLength(20).IsRequired();
+            });
         }
     }
 }

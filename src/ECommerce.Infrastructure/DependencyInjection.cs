@@ -3,14 +3,17 @@ using ECommerce.Application.Interfaces.Payment;
 using ECommerce.Domain.Interfaces;
 using ECommerce.Domain.Interfaces.CatalogInterfaces;
 using ECommerce.Domain.Interfaces.OrderInterfaces;
+using ECommerce.Infrastructure.BackgroundJobs;
 using ECommerce.Infrastructure.ExternalServices.Payment;
 using ECommerce.Infrastructure.Identity;
 using ECommerce.Infrastructure.Persistence.DbContext;
 using ECommerce.Infrastructure.Repositories;
+using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 
 namespace ECommerce.Infrastructure;
 
@@ -43,7 +46,15 @@ public static class DependencyInjection
         // services.AddScoped<CategorySeeder>();
 
         // 5. Register Background Jobs (Hosted Services)
-        // services.AddHostedService<StockReservationCleanupJob>();
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddHangfireServer();
+
+        services.AddScoped<StockReservationCleanupJob>();
 
         // 6. Register Identity
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>

@@ -11,7 +11,7 @@ namespace ECommerce.Infrastructure.Persistence.Configurations.UserConfigurations
     {
         public void Configure(EntityTypeBuilder<Notification> builder)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }

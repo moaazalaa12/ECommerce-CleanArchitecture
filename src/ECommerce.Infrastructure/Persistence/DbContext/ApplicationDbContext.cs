@@ -54,8 +54,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 var idProperty = entityType.FindProperty(nameof(BaseEntity.Id));
                 if (idProperty != null && idProperty.ClrType == typeof(Guid))
                 {
-                    idProperty.SetValueGeneratorFactory((_, _) => new GuidV7ValueGenerator());
-                    idProperty.ValueGenerated = Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.OnAdd;
+                    //idProperty.SetValueGeneratorFactory((_, _) => new GuidV7ValueGenerator());
+                    //idProperty.ValueGenerated = Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.OnAdd;
                 }
 
                 modelBuilder.Entity(entityType.ClrType, builder =>

@@ -1,6 +1,8 @@
 using ECommerce.Application;
 using ECommerce.Infrastructure;
+using ECommerce.Infrastructure.BackgroundJobs;
 using ECommerce.WebAPI.Handlers;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,9 +35,15 @@ builder.Services.AddSwaggerGen();
 // Note: builder.Services.AddOpenApi() generates the spec, but AddSwaggerGen() is needed for the actual UI.
 
 builder.Services.AddDataProtection();
-builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+//builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 var app = builder.Build();
 
+app.UseHangfireDashboard("/hangfire");
+
+RecurringJob.AddOrUpdate<StockReservationCleanupJob>(
+    "stock-reservation-cleanup",
+    job => job.ExecuteAsync(),
+    "*/5 * * * *");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

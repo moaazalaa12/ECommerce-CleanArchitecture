@@ -12,8 +12,12 @@ namespace ECommerce.Application.Features.Orders.Queries.GetOrderById
         {
             var order = await _orderRepository.GetOrderWithDetailsByIdAsync(request.OrderId, cancellationToken);
 
+
             if (order == null)
                 throw new NotFoundException($"Order with Id {request.OrderId} was not found.");
+
+            if (order.UserId != request.UserId)
+                throw new UnauthorizedAccessException($"User with Id {request.UserId} is not authorized to access this order.");
 
             return _mapper.Map<OrderDto>(order);
         }
