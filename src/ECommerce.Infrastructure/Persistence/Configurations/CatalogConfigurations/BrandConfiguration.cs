@@ -11,7 +11,7 @@ namespace ECommerce.Infrastructure.Persistence.Configurations.CatalogConfigurati
     {
         public void Configure(EntityTypeBuilder<Brand> builder)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }

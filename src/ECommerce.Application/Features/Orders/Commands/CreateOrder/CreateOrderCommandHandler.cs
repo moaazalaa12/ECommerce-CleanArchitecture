@@ -1,5 +1,4 @@
 ﻿using Application.Exceptions;
-using ECommerce.Application.Features.Orders.Commands.CreateOrder;
 using ECommerce.Domain.Entities.OrderEntities;
 using ECommerce.Domain.Enums;
 using ECommerce.Domain.Interfaces.CatalogInterfaces;
@@ -7,7 +6,7 @@ using ECommerce.Domain.Interfaces.OrderInterfaces;
 using ECommerce.Domain.ValueObjects;
 using MediatR;
 
-namespace ECommerce.Application.Orders.Commands.CreateOrder
+namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
 {
     public class CreateOrderCommandHandler(IOrderRepository _orderRepo,
         IProductRepository _productRepo,

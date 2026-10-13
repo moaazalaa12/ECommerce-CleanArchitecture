@@ -28,7 +28,8 @@ namespace ECommerce.WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrderById(Guid id)
         {
-            var result = await _mediator.Send(new GetOrderByIdQuery(id));
+            var userId = User.GetUserId();
+            var result = await _mediator.Send(new GetOrderByIdQuery(id, userId));
 
             return Ok(result);
         }

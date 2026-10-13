@@ -9,7 +9,7 @@ namespace ECommerce.Infrastructure.Persistence.Configurations.CatalogConfigurati
     {
         public void Configure(EntityTypeBuilder<Review> builder)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }
