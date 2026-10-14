@@ -1,8 +1,10 @@
 ﻿using Application.Exceptions;
 using ECommerce.Application.Features.Payments.Commands.CreatePaymentIntent;
+using ECommerce.Application.Interfaces.Notifications;
 using ECommerce.Application.Interfaces.Payment;
 using ECommerce.Domain.Entities.OrderEntities;
 using ECommerce.Domain.Enums;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Domain.Interfaces.OrderInterfaces;
 using FluentAssertions;
 using Moq;
@@ -13,15 +15,20 @@ public class CreatePaymentIntentCommandHandlerTests
 {
     private readonly Mock<IOrderRepository> _orderRepositoryMock;
     private readonly Mock<IPaymentService> _paymentServiceMock;
+
+    private readonly Mock<IUnitOfWork> _unitofwork;
+
     private readonly CreatePaymentIntentCommandHandler _handler;
 
     public CreatePaymentIntentCommandHandlerTests()
     {
         _orderRepositoryMock = new Mock<IOrderRepository>();
         _paymentServiceMock = new Mock<IPaymentService>();
+        _unitofwork = new Mock<IUnitOfWork>();
         _handler = new CreatePaymentIntentCommandHandler(
             _orderRepositoryMock.Object,
-            _paymentServiceMock.Object);
+            _paymentServiceMock.Object,
+            _unitofwork.Object);
     }
 
     [Fact]

@@ -1,6 +1,8 @@
 ﻿using ECommerce.Application.Features.Payments.Commands.UpdatePaymentStatus;
+using ECommerce.Application.Interfaces.Notifications;
 using ECommerce.Domain.Entities.OrderEntities;
 using ECommerce.Domain.Enums;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Domain.Interfaces.OrderInterfaces;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -14,12 +16,21 @@ public class UpdatePaymentStatusCommandHandlerTests
     private readonly Mock<ILogger<UpdatePaymentStatusCommandHandler>> _loggerMock;
     private readonly UpdatePaymentStatusCommandHandler _handler;
 
+    private readonly Mock<IUnitOfWork> _unitofwork;
+
+    private readonly Mock<INotificationService> _notificationservice;
+    
+
     public UpdatePaymentStatusCommandHandlerTests()
     {
         _orderRepositoryMock = new Mock<IOrderRepository>();
         _loggerMock = new Mock<ILogger<UpdatePaymentStatusCommandHandler>>();
+        _unitofwork = new Mock<IUnitOfWork>();
+        _notificationservice = new Mock<INotificationService>();
         _handler = new UpdatePaymentStatusCommandHandler(
             _orderRepositoryMock.Object,
+            _unitofwork.Object,
+            _notificationservice.Object,
             _loggerMock.Object);
     }
 

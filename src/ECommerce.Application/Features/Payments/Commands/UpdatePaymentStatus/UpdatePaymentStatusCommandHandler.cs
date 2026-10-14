@@ -1,12 +1,18 @@
-﻿using ECommerce.Domain.Enums;
+﻿using ECommerce.Application.Interfaces.Notifications;
+using ECommerce.Domain.Enums;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Domain.Interfaces.OrderInterfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Application.Features.Payments.Commands.UpdatePaymentStatus
 {
-    public class UpdatePaymentStatusCommandHandler(IOrderRepository _orderRepository, ILogger<UpdatePaymentStatusCommandHandler> _logger)
-        : IRequestHandler<UpdatePaymentStatusCommand>
+    public class UpdatePaymentStatusCommandHandler(
+    IOrderRepository _orderRepository,
+    IUnitOfWork _unitOfWork,
+    INotificationService _notificationService,
+    ILogger<UpdatePaymentStatusCommandHandler> _logger)
+    : IRequestHandler<UpdatePaymentStatusCommand>
     {
         public async Task Handle(
             UpdatePaymentStatusCommand request,
@@ -58,9 +64,32 @@ namespace ECommerce.Application.Features.Payments.Commands.UpdatePaymentStatus
                 order.PaymentStatus = PaymentStatus.Failed;
             }
 
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
             _logger.LogInformation(
                 "Payment status updated for Order {OrderId}: {Status}",
                 order.Id, targetStatus);
+
+            if (request.IsSuccess)
+            {
+                await _notificationService.SendNotificationAsync(
+                    userId: order.UserId,
+                    title: "Payment Successful",
+                    message: $"Payment for order #{order.Id} was successful.",
+                    type: NotificationType.PaymentSuccess,
+                    relatedEntityId: order.Id,
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                await _notificationService.SendNotificationAsync(
+                    userId: order.UserId,
+                    title: "Payment Failed",
+                    message: $"Payment for order #{order.Id} failed. Please try again.",
+                    type: NotificationType.PaymentFailed,
+                    relatedEntityId: order.Id,
+                    cancellationToken: cancellationToken);
+            }
         }
     }
 }
