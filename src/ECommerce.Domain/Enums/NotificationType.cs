@@ -3,11 +3,13 @@ namespace ECommerce.Domain.Enums;
 public enum NotificationType
 {
     OrderPlaced = 0,
-    OrderShipped = 1,
-    OrderDelivered = 2,
-    OrderCancelled = 3,
-    PaymentSuccess = 4,
-    PaymentFailed = 5,
-    NewReview = 6,
-    CouponApplied = 7
+    OrderProcessing = 1,
+    OrderShipped = 2,
+    OrderDelivered = 3,
+    OrderCancelled = 4,
+    PaymentSuccess = 5,
+    PaymentFailed = 6,
+    PaymentRefunded = 7,
+    NewReview = 8,
+    CouponApplied = 9
 }

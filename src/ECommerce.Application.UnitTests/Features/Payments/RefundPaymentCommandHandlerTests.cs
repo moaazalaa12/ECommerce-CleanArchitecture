@@ -1,8 +1,10 @@
 ﻿using Application.Exceptions;
 using ECommerce.Application.Features.Payments.Commands.RefundPayment;
+using ECommerce.Application.Interfaces.Notifications;
 using ECommerce.Application.Interfaces.Payment;
 using ECommerce.Domain.Entities.OrderEntities;
 using ECommerce.Domain.Enums;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Domain.Interfaces.OrderInterfaces;
 using FluentAssertions;
 using Moq;
@@ -13,15 +15,23 @@ public class RefundPaymentCommandHandlerTests
 {
     private readonly Mock<IOrderRepository> _orderRepositoryMock;
     private readonly Mock<IPaymentService> _paymentServiceMock;
+
+    private readonly Mock<IUnitOfWork> _unitofwork;
+
+    private readonly Mock<INotificationService> _notificationservice;
     private readonly RefundPaymentCommandHandler _handler;
 
     public RefundPaymentCommandHandlerTests()
     {
         _orderRepositoryMock = new Mock<IOrderRepository>();
         _paymentServiceMock = new Mock<IPaymentService>();
+        _unitofwork = new Mock<IUnitOfWork>();
+        _notificationservice = new Mock<INotificationService>();
         _handler = new RefundPaymentCommandHandler(
             _orderRepositoryMock.Object,
-            _paymentServiceMock.Object);
+            _paymentServiceMock.Object,
+            _unitofwork.Object,
+            _notificationservice.Object);
     }
 
     [Fact]

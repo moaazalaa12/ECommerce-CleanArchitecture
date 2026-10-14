@@ -1,8 +1,10 @@
-﻿using System.Reflection;
-using ECommerce.Application.Behaviors;
+﻿using ECommerce.Application.Behaviors;
+using ECommerce.Application.Interfaces.Notifications;
+using ECommerce.Application.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 namespace ECommerce.Application;
 public static class DependencyInjection
 {
@@ -22,6 +24,7 @@ public static class DependencyInjection
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
             config.AddOpenBehavior(typeof(TransactionBehavior<,>));
         });
+        services.AddScoped<INotificationService, NotificationService>();
 
         return services;
     }

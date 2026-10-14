@@ -1,6 +1,8 @@
 ﻿using Application.Exceptions;
+using ECommerce.Application.Interfaces.Notifications;
 using ECommerce.Domain.Entities.OrderEntities;
 using ECommerce.Domain.Enums;
+using ECommerce.Domain.Interfaces;
 using ECommerce.Domain.Interfaces.CatalogInterfaces;
 using ECommerce.Domain.Interfaces.OrderInterfaces;
 using ECommerce.Domain.ValueObjects;
@@ -8,18 +10,20 @@ using MediatR;
 
 namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
 {
-    public class CreateOrderCommandHandler(IOrderRepository _orderRepo,
-        IProductRepository _productRepo,
-        ICouponRepository _couponRepo,
-        ICouponUsageRepository _couponUsageRepo,
-        IStockReservationRepository _stockReservationRepo) : IRequestHandler<CreateOrderCommand, Guid>
+    public class CreateOrderCommandHandler(
+    IOrderRepository _orderRepo,
+    IProductRepository _productRepo,
+    ICouponRepository _couponRepo,
+    ICouponUsageRepository _couponUsageRepo,
+    IStockReservationRepository _stockReservationRepo,
+    IUnitOfWork _unitOfWork,
+    INotificationService _notificationService) : IRequestHandler<CreateOrderCommand, Guid>
     {
         public async Task<Guid> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             if (request.Items == null || !request.Items.Any())
                 throw new ArgumentException("Order must contain at least one item.");
 
-            // 1. Fetch all requested products in a single DB trip
             var productIds = request.Items.Select(i => i.ProductId).ToList();
             var products = (await _productRepo.FindAsync(p => productIds.Contains(p.Id)))
                            .ToDictionary(p => p.Id);
@@ -28,7 +32,6 @@ namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
             var orderItems = new List<OrderItem>();
             var stockReservations = new List<StockReservation>();
 
-            // 2. Validate products and calculate subtotal
             foreach (var item in request.Items)
             {
                 if (!products.TryGetValue(item.ProductId, out var product))
@@ -40,11 +43,9 @@ namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
                 if (product.StockQuantity < item.Quantity)
                     throw new InvalidOperationException($"Insufficient stock for '{product.Name}'. Available: {product.StockQuantity}");
 
-                // Prefer DiscountPrice if available
                 var priceAtPurchase = product.DiscountPrice ?? product.Price;
                 subTotal += priceAtPurchase * item.Quantity;
 
-                // Deduct stock temporarily
                 product.StockQuantity -= item.Quantity;
                 _productRepo.Update(product);
 
@@ -55,7 +56,6 @@ namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
                     PriceAtPurchase = priceAtPurchase
                 });
 
-                // 15-minute industry standard reservation
                 stockReservations.Add(new StockReservation
                 {
                     ProductId = item.ProductId,
@@ -65,14 +65,13 @@ namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
                 });
             }
 
-            // 3. Calculate Shipping Fee based on DeliveryMethod
             decimal shippingFee = request.DeliveryMethod switch
             {
                 DeliveryMethod.Express => 100m,
                 DeliveryMethod.Standard => 50m,
                 _ => 50m
             };
-            // 4. Validate and calculate Coupon discount
+
             decimal discountAmount = 0;
             if (request.CouponId.HasValue)
             {
@@ -91,7 +90,6 @@ namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
                     ? coupon.DiscountValue
                     : subTotal * (coupon.DiscountValue / 100m);
 
-                // Prevent discount from exceeding the subtotal
                 if (discountAmount > subTotal)
                     discountAmount = subTotal;
 
@@ -110,7 +108,6 @@ namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
                 ZipCode = request.ShippingAddress.ZipCode
             };
 
-            // 5. Create Order
             var order = new Order
             {
                 UserId = request.UserId,
@@ -128,14 +125,12 @@ namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
 
             await _orderRepo.AddAsync(order);
 
-            // 6. Link and save Stock Reservations
             foreach (var reservation in stockReservations)
             {
                 reservation.Order = order;
                 await _stockReservationRepo.AddAsync(reservation);
             }
 
-            // 7. Save Coupon Usage
             if (request.CouponId.HasValue)
             {
                 var couponUsage = new CouponUsage
@@ -148,7 +143,17 @@ namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
                 await _couponUsageRepo.AddAsync(couponUsage);
             }
 
-            // TransactionBehavior handles SaveChangesAsync & Commit.
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+
+            await _notificationService.SendNotificationAsync(
+                userId: order.UserId,
+                title: "Order Placed",
+                message: $"Your order #{order.Id} has been placed successfully.",
+                type: NotificationType.OrderPlaced,
+                relatedEntityId: order.Id,
+                cancellationToken: cancellationToken);
+
             return order.Id;
         }
     }

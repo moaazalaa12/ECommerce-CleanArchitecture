@@ -8,6 +8,7 @@ using ECommerce.Infrastructure.Persistence.ValueGenerators;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace ECommerce.Infrastructure.Persistence.DbContext;
 
@@ -47,6 +48,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
@@ -54,8 +57,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 var idProperty = entityType.FindProperty(nameof(BaseEntity.Id));
                 if (idProperty != null && idProperty.ClrType == typeof(Guid))
                 {
-                    //idProperty.SetValueGeneratorFactory((_, _) => new GuidV7ValueGenerator());
-                    //idProperty.ValueGenerated = Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.OnAdd;
+                    idProperty.SetValueGeneratorFactory((_, _) => new GuidV7ValueGenerator());
+                    idProperty.ValueGenerated = Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.OnAdd;
                 }
 
                 modelBuilder.Entity(entityType.ClrType, builder =>
@@ -75,17 +78,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                     builder.Property<Guid?>(nameof(BaseEntity.CreatedBy));
                     builder.Property<Guid?>(nameof(BaseEntity.UpdatedBy));
 
-                    var parameter = System.Linq.Expressions.Expression.Parameter(entityType.ClrType, "e");
-                    var property = System.Linq.Expressions.Expression.PropertyOrField(parameter, nameof(BaseEntity.IsDeleted));
-                    var entityNotDeleted = System.Linq.Expressions.Expression.Equal(property, System.Linq.Expressions.Expression.Constant(false));
-                    var lambda = System.Linq.Expressions.Expression.Lambda(entityNotDeleted, parameter);
+                    var parameter = Expression.Parameter(entityType.ClrType, "e");
+                    var property = Expression.PropertyOrField(parameter, nameof(BaseEntity.IsDeleted));
+                    var entityNotDeleted = Expression.Equal(property, Expression.Constant(false));
+                    var lambda = Expression.Lambda(entityNotDeleted, parameter);
 
                     builder.HasQueryFilter(lambda);
                 });
             }
         }
-
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

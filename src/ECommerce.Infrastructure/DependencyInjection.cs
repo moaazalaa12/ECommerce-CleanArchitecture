@@ -3,6 +3,7 @@ using ECommerce.Application.Interfaces.Payment;
 using ECommerce.Domain.Interfaces;
 using ECommerce.Domain.Interfaces.CatalogInterfaces;
 using ECommerce.Domain.Interfaces.OrderInterfaces;
+using ECommerce.Domain.Interfaces.UserInterfaces;
 using ECommerce.Infrastructure.BackgroundJobs;
 using ECommerce.Infrastructure.ExternalServices.Payment;
 using ECommerce.Infrastructure.Identity;
@@ -36,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IStockReservationRepository, StockReservationRepository>();
         services.AddScoped<ICouponUsageRepository, CouponUsageRepository>();
         services.AddScoped<ICouponRepository, CouponRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
         // 3. Register External Services
         // services.AddTransient<IEmailService, SmtpEmailService>();
