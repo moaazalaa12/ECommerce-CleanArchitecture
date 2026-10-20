@@ -12,6 +12,8 @@ public class Product : BaseEntity
     public decimal? DiscountPrice { get; set; }
     public int StockQuantity { get; set; }
     public bool IsActive { get; set; } = true;
+    public double AverageRating { get; set; } = 0;
+    public int ReviewsCount { get; set; } = 0;
     public Guid CategoryId { get; set; }
     public Guid? BrandId { get; set; }
 

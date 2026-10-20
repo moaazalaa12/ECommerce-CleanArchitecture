@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ECommerce.Infrastructure.Repositories
+namespace ECommerce.Infrastructure.Repositories.OrderRepositories
 {
-    public class CouponRepository : GenericRepository<Coupon>, ICouponRepository
+    public class CouponUsageRepository : GenericRepository<CouponUsage>, ICouponUsageRepository
     {
-        public CouponRepository(ApplicationDbContext context) : base(context)
+        public CouponUsageRepository(ApplicationDbContext context) : base(context)
         {
         }
     }

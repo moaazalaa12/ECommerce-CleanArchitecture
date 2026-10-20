@@ -4,7 +4,7 @@ using ECommerce.Domain.Interfaces.UserInterfaces;
 using ECommerce.Infrastructure.Persistence.DbContext;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Infrastructure.Repositories
+namespace ECommerce.Infrastructure.Repositories.UserRepositories
 {
     public class NotificationRepository : GenericRepository<Notification>, INotificationRepository
     {

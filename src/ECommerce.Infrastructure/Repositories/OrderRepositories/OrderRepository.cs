@@ -4,7 +4,7 @@ using ECommerce.Domain.Interfaces.OrderInterfaces;
 using ECommerce.Infrastructure.Persistence.DbContext;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Infrastructure.Repositories
+namespace ECommerce.Infrastructure.Repositories.OrderRepositories
 {
     public class OrderRepository : GenericRepository<Order>, IOrderRepository
     {
@@ -64,10 +64,18 @@ namespace ECommerce.Infrastructure.Repositories
 
         public async Task<Order?> GetOrderByPaymentIntentIdAsync(string paymentIntentId)
         {
-            return await _dbContext.Orders
+            return await _dbSet
                 .Include(o => o.Payments)
                 .FirstOrDefaultAsync(o =>
                     o.Payments.Any(p => p.TransactionId == paymentIntentId));
+        }
+
+        public async Task<bool> HasUserPurchasedProductAsync(Guid userId, Guid productId, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet
+                .Where(o => o.UserId == userId && o.PaymentStatus == PaymentStatus.Success)
+                .SelectMany(o => o.OrderItems)
+                .AnyAsync(oi => oi.ProductId == productId, cancellationToken);
         }
     }
 }

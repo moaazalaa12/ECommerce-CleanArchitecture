@@ -16,5 +16,6 @@ namespace ECommerce.Domain.Interfaces.OrderInterfaces
             CancellationToken cancellationToken = default);
 
         Task<Order?> GetOrderByPaymentIntentIdAsync(string paymentIntentId);
+        Task<bool> HasUserPurchasedProductAsync(Guid userId, Guid productId, CancellationToken cancellationToken = default);
     }
 }

@@ -7,7 +7,7 @@ public class Review : BaseEntity
 {
     public Guid UserId { get; set; } = Guid.Empty;
     public Guid ProductId { get; set; }
-    public int Rating { get; set; }         // 1 to 5
+    public int Rating { get; set; }
     public string? Comment { get; set; }
     public bool IsVerifiedPurchase { get; set; } = false;
 

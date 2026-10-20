@@ -17,25 +17,25 @@ public class GenericRepository<T>: IGenericRepository<T> where T : class
         _dbSet = context.Set<T>();
     }
     
-    public async Task<T?> GetByIdAsync(Guid id)
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _dbSet.FindAsync(id);
+        return await _dbSet.FindAsync(id, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    public async Task<IReadOnlyList<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
-        return await _dbSet.Where(predicate).ToListAsync();
+        return await _dbSet.Where(predicate).ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<T>> GetAllAsync()
+    public async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _dbSet.ToListAsync();
+        return await _dbSet.ToListAsync(cancellationToken);
     }
 
 
-    public async Task AddAsync(T entity)
+    public async Task AddAsync(T entity, CancellationToken cancellationToken)
     {
-        await _dbSet.AddAsync(entity);
+        await _dbSet.AddAsync(entity, cancellationToken);
     }
 
     public void Update(T entity)
