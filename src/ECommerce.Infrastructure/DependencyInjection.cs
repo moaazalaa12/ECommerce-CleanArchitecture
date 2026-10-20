@@ -9,6 +9,9 @@ using ECommerce.Infrastructure.ExternalServices.Payment;
 using ECommerce.Infrastructure.Identity;
 using ECommerce.Infrastructure.Persistence.DbContext;
 using ECommerce.Infrastructure.Repositories;
+using ECommerce.Infrastructure.Repositories.CatalogRepositories;
+using ECommerce.Infrastructure.Repositories.OrderRepositories;
+using ECommerce.Infrastructure.Repositories.UserRepositories;
 using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +41,8 @@ public static class DependencyInjection
         services.AddScoped<ICouponUsageRepository, CouponUsageRepository>();
         services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IWishlistItemRepository, WishlistItemRepository>();
+        services.AddScoped<IReviewRepository, ReviewRepository>();
 
         // 3. Register External Services
         // services.AddTransient<IEmailService, SmtpEmailService>();

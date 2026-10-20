@@ -2,7 +2,7 @@
 using ECommerce.Domain.Interfaces.OrderInterfaces;
 using ECommerce.Infrastructure.Persistence.DbContext;
 
-namespace ECommerce.Infrastructure.Repositories
+namespace ECommerce.Infrastructure.Repositories.OrderRepositories
 {
     public class StockReservationRepository : GenericRepository<StockReservation>, IStockReservationRepository
     {

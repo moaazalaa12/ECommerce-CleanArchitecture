@@ -7,7 +7,6 @@ public class WishlistItem : BaseEntity
 {
     public Guid UserId { get; set; } = Guid.Empty;
     public Guid ProductId { get; set; }
-    public DateTime AddedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation Properties
     public Product Product { get; set; } = null!;

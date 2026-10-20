@@ -1,6 +1,10 @@
 ﻿using ECommerce.Application.Behaviors;
 using ECommerce.Application.Interfaces.Notifications;
+using ECommerce.Application.Interfaces.Reviews;
+using ECommerce.Application.Interfaces.Wishlist;
 using ECommerce.Application.Services;
+using ECommerce.Application.Services.Reviews;
+using ECommerce.Application.Services.Wishlist;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +29,8 @@ public static class DependencyInjection
             config.AddOpenBehavior(typeof(TransactionBehavior<,>));
         });
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IWishlistService, WishlistService>();
+        services.AddScoped<IReviewService, ReviewService>();
 
         return services;
     }

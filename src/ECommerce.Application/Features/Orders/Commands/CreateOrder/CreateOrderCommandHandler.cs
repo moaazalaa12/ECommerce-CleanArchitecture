@@ -7,24 +7,39 @@ using ECommerce.Domain.Interfaces.CatalogInterfaces;
 using ECommerce.Domain.Interfaces.OrderInterfaces;
 using ECommerce.Domain.ValueObjects;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
 {
     public class CreateOrderCommandHandler(
-    IOrderRepository _orderRepo,
-    IProductRepository _productRepo,
-    ICouponRepository _couponRepo,
-    ICouponUsageRepository _couponUsageRepo,
-    IStockReservationRepository _stockReservationRepo,
-    IUnitOfWork _unitOfWork,
-    INotificationService _notificationService) : IRequestHandler<CreateOrderCommand, Guid>
+        IOrderRepository _orderRepo,
+        IProductRepository _productRepo,
+        ICouponRepository _couponRepo,
+        ICouponUsageRepository _couponUsageRepo,
+        IStockReservationRepository _stockReservationRepo,
+        IUnitOfWork _unitOfWork,
+        INotificationService _notificationService,
+        ILogger<CreateOrderCommandHandler> _logger) : IRequestHandler<CreateOrderCommand, Guid>
     {
         public async Task<Guid> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             if (request.Items == null || !request.Items.Any())
-                throw new ArgumentException("Order must contain at least one item.");
+                throw new BadRequestException("Order must contain at least one item.");
 
-            var productIds = request.Items.Select(i => i.ProductId).ToList();
+            if (request.Items.Any(i => i.Quantity <= 0))
+                throw new BadRequestException("Item quantity must be greater than zero.");
+
+            // Merge duplicate product entries to validate total requested quantity accurately
+            var groupedItems = request.Items
+                .GroupBy(i => i.ProductId)
+                .Select(g => new
+                {
+                    ProductId = g.Key,
+                    Quantity = g.Sum(i => i.Quantity)
+                })
+                .ToList();
+
+            var productIds = groupedItems.Select(i => i.ProductId).ToList();
             var products = (await _productRepo.FindAsync(p => productIds.Contains(p.Id)))
                            .ToDictionary(p => p.Id);
 
@@ -32,16 +47,16 @@ namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
             var orderItems = new List<OrderItem>();
             var stockReservations = new List<StockReservation>();
 
-            foreach (var item in request.Items)
+            foreach (var item in groupedItems)
             {
                 if (!products.TryGetValue(item.ProductId, out var product))
                     throw new KeyNotFoundException($"Product with Id {item.ProductId} not found.");
 
                 if (!product.IsActive)
-                    throw new InvalidOperationException($"Product '{product.Name}' is not active.");
+                    throw new BadRequestException($"Product '{product.Name}' is not active.");
 
                 if (product.StockQuantity < item.Quantity)
-                    throw new InvalidOperationException($"Insufficient stock for '{product.Name}'. Available: {product.StockQuantity}");
+                    throw new BadRequestException($"Insufficient stock for '{product.Name}'. Available: {product.StockQuantity}");
 
                 var priceAtPurchase = product.DiscountPrice ?? product.Price;
                 subTotal += priceAtPurchase * item.Quantity;
@@ -145,14 +160,21 @@ namespace ECommerce.Application.Features.Orders.Commands.CreateOrder
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-
-            await _notificationService.SendNotificationAsync(
-                userId: order.UserId,
-                title: "Order Placed",
-                message: $"Your order #{order.Id} has been placed successfully.",
-                type: NotificationType.OrderPlaced,
-                relatedEntityId: order.Id,
-                cancellationToken: cancellationToken);
+            // Prevent notification failures from rolling back a successfully saved order
+            try
+            {
+                await _notificationService.SendNotificationAsync(
+                    userId: order.UserId,
+                    title: "Order Placed",
+                    message: $"Your order #{order.Id} has been placed successfully.",
+                    type: NotificationType.OrderPlaced,
+                    relatedEntityId: order.Id,
+                    cancellationToken: cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send order placement notification for OrderId: {OrderId}", order.Id);
+            }
 
             return order.Id;
         }
